@@ -1,33 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useWallet } from "@/lib/wallet-context";
 
 export function WalletConnect() {
-  const [connected, setConnected] = useState(false);
-  const [publicKey, setPublicKey] = useState<string | null>(null);
-
-  const connect = async () => {
-    if (typeof window === "undefined") return;
-
-    const freighter = (window as any).freighter;
-    if (!freighter) {
-      alert("Please install the Freighter wallet extension");
-      return;
-    }
-
-    try {
-      const key = await freighter.getPublicKey();
-      setPublicKey(key);
-      setConnected(true);
-    } catch (err) {
-      console.error("Failed to connect wallet:", err);
-    }
-  };
-
-  const disconnect = () => {
-    setConnected(false);
-    setPublicKey(null);
-  };
+  const { connected, publicKey, connect, disconnect } = useWallet();
 
   if (!connected) {
     return (

@@ -22,3 +22,8 @@ export function formatAmount(stroops: string | number): string {
     maximumFractionDigits: 7,
   });
 }
+
+/** Convert XLM amount to stroops (bigint) */
+export function xlmToStroops(amount: string | number): bigint {
+  return BigInt(Math.round(Number(amount) * 10_000_000));
+}
