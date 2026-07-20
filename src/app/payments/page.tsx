@@ -1,6 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import {
+  Keypair,
+  SorobanRpc,
+  TransactionBuilder,
+  Networks,
+  BASE_FEE,
+  Operation,
+  Asset,
+} from "@stellar/stellar-sdk";
+import { useWallet } from "@/lib/wallet-context";
+import { TESTNET_RPC, formatAddress, xlmToStroops } from "@/lib/stellar";
 
 interface Payment {
   id: string;
@@ -13,18 +24,82 @@ interface Payment {
 }
 
 export default function PaymentsPage() {
-  const [payments] = useState<Payment[]>([]);
+  const { connected, publicKey, signTransaction } = useWallet();
+  const [payments, setPayments] = useState<Payment[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
   const [asset, setAsset] = useState("native");
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!connected || !publicKey) {
+      setError("Please connect your wallet first");
+      return;
+    }
+
     setSubmitting(true);
-    // TODO: Wire up to Stellium SDK — use StelliumClient.createPayment()
-    setTimeout(() => setSubmitting(false), 1000);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const server = new SorobanRpc.Server(TESTNET_RPC);
+      const sourceAccount = await server.getAccount(publicKey);
+
+      const stroops = xlmToStroops(amount);
+      const paymentAsset =
+        asset === "native" ? Asset.native() : new Asset(asset, publicKey);
+
+      const tx = new TransactionBuilder(sourceAccount, {
+        fee: BASE_FEE,
+        networkPassphrase: Networks.TESTNET,
+      })
+        .addOperation(
+          Operation.payment({
+            destination: recipient,
+            asset: paymentAsset,
+            amount: stroops.toString(),
+          })
+        )
+        .setTimeout(30)
+        .build();
+
+      const signedXdr = await signTransaction(tx.toXDR());
+      const signedTx = TransactionBuilder.fromXDR(
+        signedXdr,
+        Networks.TESTNET
+      );
+
+      const result = await server.sendTransaction(signedTx);
+
+      if (result.status === "PENDING") {
+        const newPayment: Payment = {
+          id: result.hash.slice(0, 8),
+          recipient,
+          amount,
+          asset: asset === "native" ? "XLM" : asset.toUpperCase(),
+          status: "completed",
+          txHash: result.hash,
+          createdAt: new Date().toISOString().split("T")[0],
+        };
+        setPayments((prev) => [newPayment, ...prev]);
+        setSuccess(`Payment sent! TX: ${result.hash.slice(0, 12)}...`);
+        setRecipient("");
+        setAmount("");
+        setAsset("native");
+        setShowForm(false);
+      } else {
+        setError(`Transaction failed: ${result.status}`);
+      }
+    } catch (err: any) {
+      console.error("Payment failed:", err);
+      setError(err?.message || "Payment failed. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -44,6 +119,18 @@ export default function PaymentsPage() {
         </button>
       </div>
 
+      {/* Feedback Messages */}
+      {error && (
+        <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="mb-4 rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-400">
+          {success}
+        </div>
+      )}
+
       {/* Payment Form */}
       {showForm && (
         <form
@@ -51,6 +138,11 @@ export default function PaymentsPage() {
           className="mb-8 rounded-xl border border-white/10 bg-stellar-dark p-6"
         >
           <h2 className="mb-4 text-lg font-semibold">Create Payment</h2>
+          {!connected && (
+            <p className="mb-4 text-sm text-yellow-400">
+              Connect your wallet to send payments.
+            </p>
+          )}
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="sm:col-span-2">
               <label className="mb-1.5 block text-sm text-gray-400">
@@ -103,7 +195,7 @@ export default function PaymentsPage() {
             <div className="flex items-end sm:col-span-2">
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={submitting || !connected}
                 className="rounded-lg bg-stellar-blue px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-stellar-blue/80 disabled:opacity-50"
               >
                 {submitting ? "Sending..." : "Send Payment"}
