@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { LoadingButton } from "@/components/LoadingSpinner";
 
 export default function SettingsPage() {
   const [escrowContract, setEscrowContract] = useState("");
@@ -8,10 +9,14 @@ export default function SettingsPage() {
   const [webhookUrl, setWebhookUrl] = useState("");
   const [webhookSecret, setWebhookSecret] = useState("");
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
     // TODO: Persist settings to localStorage or backend
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -113,12 +118,14 @@ export default function SettingsPage() {
 
         {/* Save Button */}
         <div className="flex items-center gap-4">
-          <button
+          <LoadingButton
             type="submit"
+            loading={saving}
+            loadingText="Saving..."
             className="rounded-lg bg-stellar-blue px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-stellar-blue/80"
           >
             Save Settings
-          </button>
+          </LoadingButton>
           {saved && (
             <span className="text-sm text-green-400">Settings saved!</span>
           )}

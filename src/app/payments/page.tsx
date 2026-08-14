@@ -12,6 +12,7 @@ import {
 } from "@stellar/stellar-sdk";
 import { useWallet } from "@/lib/wallet-context";
 import { TESTNET_RPC, formatAddress, xlmToStroops } from "@/lib/stellar";
+import { LoadingButton } from "@/components/LoadingSpinner";
 
 interface Payment {
   id: string;
@@ -193,13 +194,15 @@ export default function PaymentsPage() {
               </div>
             </div>
             <div className="flex items-end sm:col-span-2">
-              <button
+              <LoadingButton
                 type="submit"
-                disabled={submitting || !connected}
+                loading={submitting}
+                loadingText="Sending..."
+                disabled={!connected}
                 className="rounded-lg bg-stellar-blue px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-stellar-blue/80 disabled:opacity-50"
               >
-                {submitting ? "Sending..." : "Send Payment"}
-              </button>
+                Send Payment
+              </LoadingButton>
             </div>
           </div>
         </form>
