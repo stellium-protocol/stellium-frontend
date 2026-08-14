@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useWallet } from "@/lib/wallet-context";
 import { useToast } from "@/lib/toast-context";
 
@@ -25,10 +26,31 @@ export function WalletConnect() {
     return (
       <button
         onClick={handleConnect}
+import { LoadingButton } from "@/components/LoadingSpinner";
+
+export function WalletConnect() {
+  const { connected, publicKey, connect, disconnect } = useWallet();
+  const [connecting, setConnecting] = useState(false);
+
+  const handleConnect = async () => {
+    setConnecting(true);
+    try {
+      await connect();
+    } finally {
+      setConnecting(false);
+    }
+  };
+
+  if (!connected) {
+    return (
+      <LoadingButton
+        onClick={handleConnect}
+        loading={connecting}
+        loadingText="Connecting..."
         className="rounded-lg bg-stellar-blue px-4 py-2 text-sm font-medium text-white hover:bg-stellar-blue/80"
       >
         Connect Wallet
-      </button>
+      </LoadingButton>
     );
   }
 

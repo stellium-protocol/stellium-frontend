@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useToast } from "@/lib/toast-context";
 
+import { LoadingButton } from "@/components/LoadingSpinner";
+
 export default function SettingsPage() {
   const { addToast } = useToast();
   const [escrowContract, setEscrowContract] = useState("");
@@ -10,10 +12,18 @@ export default function SettingsPage() {
   const [webhookUrl, setWebhookUrl] = useState("");
   const [webhookSecret, setWebhookSecret] = useState("");
 
-  const handleSave = (e: React.FormEvent) => {
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
     // TODO: Persist settings to localStorage or backend
     addToast("success", "Settings saved successfully!");
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    setSaving(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
   };
 
   return (
@@ -113,12 +123,18 @@ export default function SettingsPage() {
 
         {/* Save Button */}
         <div className="flex items-center gap-4">
-          <button
+          <LoadingButton
             type="submit"
+            loading={saving}
+            loadingText="Saving..."
             className="rounded-lg bg-stellar-blue px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-stellar-blue/80"
           >
             Save Settings
           </button>
+          </LoadingButton>
+          {saved && (
+            <span className="text-sm text-green-400">Settings saved!</span>
+          )}
         </div>
       </form>
     </div>
