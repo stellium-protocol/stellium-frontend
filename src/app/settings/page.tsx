@@ -1,19 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { useToast } from "@/lib/toast-context";
 
 export default function SettingsPage() {
+  const { addToast } = useToast();
   const [escrowContract, setEscrowContract] = useState("");
   const [paymentContract, setPaymentContract] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
   const [webhookSecret, setWebhookSecret] = useState("");
-  const [saved, setSaved] = useState(false);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Persist settings to localStorage or backend
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    addToast("success", "Settings saved successfully!");
   };
 
   return (
@@ -119,9 +119,6 @@ export default function SettingsPage() {
           >
             Save Settings
           </button>
-          {saved && (
-            <span className="text-sm text-green-400">Settings saved!</span>
-          )}
         </div>
       </form>
     </div>
