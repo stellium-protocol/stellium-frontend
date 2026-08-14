@@ -3,42 +3,28 @@
 import { useState } from "react";
 import { useWallet } from "@/lib/wallet-context";
 import { useToast } from "@/lib/toast-context";
-
-export function WalletConnect() {
-  const { connected, publicKey, connect, disconnect } = useWallet();
-  const { addToast } = useToast();
-
-  const handleConnect = async () => {
-    try {
-      await connect();
-      addToast("success", "Wallet connected successfully!");
-    } catch {
-      addToast("error", "Failed to connect wallet");
-    }
-  };
-
-  const handleDisconnect = () => {
-    disconnect();
-    addToast("info", "Wallet disconnected");
-  };
-
-  if (!connected) {
-    return (
-      <button
-        onClick={handleConnect}
 import { LoadingButton } from "@/components/LoadingSpinner";
 
 export function WalletConnect() {
   const { connected, publicKey, connect, disconnect } = useWallet();
+  const { addToast } = useToast();
   const [connecting, setConnecting] = useState(false);
 
   const handleConnect = async () => {
     setConnecting(true);
     try {
       await connect();
+      addToast("success", "Wallet connected successfully!");
+    } catch {
+      addToast("error", "Failed to connect wallet");
     } finally {
       setConnecting(false);
     }
+  };
+
+  const handleDisconnect = () => {
+    disconnect();
+    addToast("info", "Wallet disconnected");
   };
 
   if (!connected) {
