@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { WalletConnect } from "@/components/WalletConnect";
 import { WalletProvider } from "@/lib/wallet-context";
+import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Stellium — Stellar Payment Gateway",
@@ -15,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen">
+      <body className="flex min-h-screen flex-col">
         <WalletProvider>
           <nav className="sticky top-0 z-50 border-b border-white/10 bg-stellar-dark/80 backdrop-blur-md">
             <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
@@ -55,6 +56,7 @@ export default function RootLayout({
             </div>
           </nav>
           <main className="mx-auto max-w-7xl px-6 py-8">{children}</main>
+          <Footer />
         </WalletProvider>
       </body>
     </html>
