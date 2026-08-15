@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useWallet } from "@/lib/wallet-context";
+import { useToast } from "@/lib/toast-context";
 import { TESTNET_RPC, TESTNET_PASSPHRASE, formatAddress, xlmToStroops } from "@/lib/stellar";
 import { LoadingButton } from "@/components/LoadingSpinner";
 
@@ -17,25 +18,22 @@ interface Payment {
 
 export default function PaymentsPage() {
   const { connected, publicKey, signTransaction } = useWallet();
+  const { addToast } = useToast();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [recipient, setRecipient] = useState("");
   const [amount, setAmount] = useState("");
   const [asset, setAsset] = useState("native");
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!connected || !publicKey) {
-      setError("Please connect your wallet first");
+      addToast("warning", "Please connect your wallet first");
       return;
     }
 
     setSubmitting(true);
-    setError(null);
-    setSuccess(null);
 
     try {
       // Dynamically import the SDK only when submitting a payment.
@@ -89,17 +87,17 @@ export default function PaymentsPage() {
           createdAt: new Date().toISOString().split("T")[0],
         };
         setPayments((prev) => [newPayment, ...prev]);
-        setSuccess(`Payment sent! TX: ${result.hash.slice(0, 12)}...`);
+        addToast("success", `Payment sent! TX: ${result.hash.slice(0, 12)}...`);
         setRecipient("");
         setAmount("");
         setAsset("native");
         setShowForm(false);
       } else {
-        setError(`Transaction failed: ${result.status}`);
+        addToast("error", `Transaction failed: ${result.status}`);
       }
     } catch (err: any) {
       console.error("Payment failed:", err);
-      setError(err?.message || "Payment failed. Please try again.");
+      addToast("error", err?.message || "Payment failed. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -121,18 +119,6 @@ export default function PaymentsPage() {
           {showForm ? "Cancel" : "+ New Payment"}
         </button>
       </div>
-
-      {/* Feedback Messages */}
-      {error && (
-        <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-          {error}
-        </div>
-      )}
-      {success && (
-        <div className="mb-4 rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-400">
-          {success}
-        </div>
-      )}
 
       {/* Payment Form */}
       {showForm && (

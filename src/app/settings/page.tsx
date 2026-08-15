@@ -1,13 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { useToast } from "@/lib/toast-context";
+
 import { LoadingButton } from "@/components/LoadingSpinner";
 
 export default function SettingsPage() {
+  const { addToast } = useToast();
   const [escrowContract, setEscrowContract] = useState("");
   const [paymentContract, setPaymentContract] = useState("");
   const [webhookUrl, setWebhookUrl] = useState("");
   const [webhookSecret, setWebhookSecret] = useState("");
+
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -15,6 +19,7 @@ export default function SettingsPage() {
     e.preventDefault();
     setSaving(true);
     // TODO: Persist settings to localStorage or backend
+    addToast("success", "Settings saved successfully!");
     await new Promise((resolve) => setTimeout(resolve, 800));
     setSaving(false);
     setSaved(true);
