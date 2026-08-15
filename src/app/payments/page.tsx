@@ -1,17 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Keypair,
-  SorobanRpc,
-  TransactionBuilder,
-  Networks,
-  BASE_FEE,
-  Operation,
-  Asset,
-} from "@stellar/stellar-sdk";
 import { useWallet } from "@/lib/wallet-context";
-import { TESTNET_RPC, formatAddress, xlmToStroops } from "@/lib/stellar";
+import { TESTNET_RPC, TESTNET_PASSPHRASE, formatAddress, xlmToStroops } from "@/lib/stellar";
 import { LoadingButton } from "@/components/LoadingSpinner";
 
 interface Payment {
@@ -47,6 +38,17 @@ export default function PaymentsPage() {
     setSuccess(null);
 
     try {
+      // Dynamically import the SDK only when submitting a payment.
+      // This keeps the heavy SDK (and its native sodium-native dependency)
+      // out of the initial client bundle and SSR / static generation.
+      const {
+        SorobanRpc,
+        TransactionBuilder,
+        BASE_FEE,
+        Operation,
+        Asset,
+      } = await import("@stellar/stellar-sdk");
+
       const server = new SorobanRpc.Server(TESTNET_RPC);
       const sourceAccount = await server.getAccount(publicKey);
 
@@ -56,7 +58,7 @@ export default function PaymentsPage() {
 
       const tx = new TransactionBuilder(sourceAccount, {
         fee: BASE_FEE,
-        networkPassphrase: Networks.TESTNET,
+        networkPassphrase: TESTNET_PASSPHRASE,
       })
         .addOperation(
           Operation.payment({
@@ -71,7 +73,7 @@ export default function PaymentsPage() {
       const signedXdr = await signTransaction(tx.toXDR());
       const signedTx = TransactionBuilder.fromXDR(
         signedXdr,
-        Networks.TESTNET
+        TESTNET_PASSPHRASE
       );
 
       const result = await server.sendTransaction(signedTx);

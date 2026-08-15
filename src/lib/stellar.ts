@@ -1,10 +1,12 @@
-import { Keypair, SorobanRpc, TransactionBuilder, Networks, BASE_FEE } from "@stellar/stellar-sdk";
-
+// Network constants — no SDK import needed at module level.
+// This prevents @stellar/stellar-sdk (and its native sodium-native dependency)
+// from being bundled into client-side code during SSR / static generation.
 export const TESTNET_RPC = "https://soroban-testnet.stellar.org";
-export const TESTNET_PASSPHRASE = Networks.TESTNET;
+export const TESTNET_PASSPHRASE = "Test SDF Network ; September 2015";
 
-/** Get a Soroban RPC server instance */
-export function getServer(rpcUrl: string = TESTNET_RPC) {
+/** Get a Soroban RPC server instance (lazy-loads the SDK on demand) */
+export async function getServer(rpcUrl: string = TESTNET_RPC) {
+  const { SorobanRpc } = await import("@stellar/stellar-sdk");
   return new SorobanRpc.Server(rpcUrl);
 }
 
