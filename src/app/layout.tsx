@@ -59,13 +59,9 @@ export default function RootLayout({
               </div>
             </nav>
             <main className="mx-auto max-w-7xl px-6 py-8">{children}</main>
+            <Footer />
             <ToastContainer />
           </ToastProvider>
-              <WalletConnect />
-            </div>
-          </nav>
-          <main className="mx-auto max-w-7xl px-6 py-8">{children}</main>
-          <Footer />
         </WalletProvider>
       </body>
     </html>

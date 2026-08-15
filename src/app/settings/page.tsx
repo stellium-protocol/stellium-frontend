@@ -130,7 +130,6 @@ export default function SettingsPage() {
             className="rounded-lg bg-stellar-blue px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-stellar-blue/80"
           >
             Save Settings
-          </button>
           </LoadingButton>
           {saved && (
             <span className="text-sm text-green-400">Settings saved!</span>
