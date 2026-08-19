@@ -1,4 +1,14 @@
-export default function Home() {
+export default async function Home() {
+  // Simulate fetching data from backend/indexer
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
+  const stats = {
+    totalPayments: 142,
+    activeEscrows: 8,
+    totalVolume: "45,250.00",
+    successRate: "98.5",
+  };
+
   return (
     <div>
       <div className="mb-8">
@@ -17,7 +27,7 @@ export default function Home() {
               All time
             </span>
           </div>
-          <p className="mt-2 text-3xl font-bold">0</p>
+          <p className="mt-2 text-3xl font-bold">{stats.totalPayments}</p>
         </div>
         <div className="rounded-xl border border-white/10 bg-stellar-dark p-5">
           <div className="flex items-center justify-between">
@@ -26,7 +36,7 @@ export default function Home() {
               Open
             </span>
           </div>
-          <p className="mt-2 text-3xl font-bold">0</p>
+          <p className="mt-2 text-3xl font-bold">{stats.activeEscrows}</p>
         </div>
         <div className="rounded-xl border border-white/10 bg-stellar-dark p-5">
           <div className="flex items-center justify-between">
@@ -35,7 +45,7 @@ export default function Home() {
               XLM
             </span>
           </div>
-          <p className="mt-2 text-3xl font-bold">0.00</p>
+          <p className="mt-2 text-3xl font-bold">{stats.totalVolume}</p>
         </div>
         <div className="rounded-xl border border-white/10 bg-stellar-dark p-5">
           <div className="flex items-center justify-between">
@@ -44,7 +54,7 @@ export default function Home() {
               %
             </span>
           </div>
-          <p className="mt-2 text-3xl font-bold">—</p>
+          <p className="mt-2 text-3xl font-bold">{stats.successRate}%</p>
         </div>
       </div>
 
