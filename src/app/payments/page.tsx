@@ -197,55 +197,59 @@ export default function PaymentsPage() {
       )}
 
       {/* Payments Table */}
-      <div className="rounded-xl border border-white/10 bg-stellar-dark">
-        <div className="border-b border-white/10 px-6 py-3">
-          <div className="grid grid-cols-12 gap-4 text-xs font-medium uppercase tracking-wider text-gray-500">
-            <span className="col-span-4">Recipient</span>
-            <span className="col-span-2">Amount</span>
-            <span className="col-span-2">Asset</span>
-            <span className="col-span-2">Status</span>
-            <span className="col-span-2">Date</span>
-          </div>
-        </div>
-        {payments.length === 0 ? (
-          <div className="px-6 py-16 text-center text-gray-500">
-            <p className="text-sm">No payments yet</p>
-            <p className="mt-1 text-xs text-gray-600">
-              Click &quot;+ New Payment&quot; to send your first payment.
-            </p>
-          </div>
-        ) : (
-          payments.map((p) => (
-            <div
-              key={p.id}
-              className="border-b border-white/5 px-6 py-4 transition-colors hover:bg-white/[0.02]"
-            >
-              <div className="grid grid-cols-12 gap-4 text-sm">
-                <span className="col-span-4 truncate font-mono text-xs">
-                  {p.recipient}
-                </span>
-                <span className="col-span-2 font-medium">{p.amount}</span>
-                <span className="col-span-2 text-gray-400">{p.asset}</span>
-                <span className="col-span-2">
-                  <span
-                    className={`inline-block rounded-full px-2 py-0.5 text-xs ${
-                      p.status === "completed"
-                        ? "bg-green-500/20 text-green-400"
-                        : p.status === "pending"
-                        ? "bg-yellow-500/20 text-yellow-400"
-                        : "bg-red-500/20 text-red-400"
-                    }`}
-                  >
-                    {p.status}
-                  </span>
-                </span>
-                <span className="col-span-2 text-xs text-gray-500">
-                  {p.createdAt}
-                </span>
+      <div className="rounded-xl border border-white/10 bg-stellar-dark overflow-hidden">
+        <div className="overflow-x-auto">
+          <div className="min-w-[800px]">
+            <div className="border-b border-white/10 px-6 py-3">
+              <div className="grid grid-cols-12 gap-4 text-xs font-medium uppercase tracking-wider text-gray-500">
+                <span className="col-span-4">Recipient</span>
+                <span className="col-span-2">Amount</span>
+                <span className="col-span-2">Asset</span>
+                <span className="col-span-2">Status</span>
+                <span className="col-span-2">Date</span>
               </div>
             </div>
-          ))
-        )}
+            {payments.length === 0 ? (
+              <div className="px-6 py-16 text-center text-gray-500">
+                <p className="text-sm">No payments yet</p>
+                <p className="mt-1 text-xs text-gray-600">
+                  Click &quot;+ New Payment&quot; to send your first payment.
+                </p>
+              </div>
+            ) : (
+              payments.map((p) => (
+                <div
+                  key={p.id}
+                  className="border-b border-white/5 px-6 py-4 transition-colors hover:bg-white/[0.02]"
+                >
+                  <div className="grid grid-cols-12 gap-4 text-sm">
+                    <span className="col-span-4 truncate font-mono text-xs">
+                      {p.recipient}
+                    </span>
+                    <span className="col-span-2 font-medium">{p.amount}</span>
+                    <span className="col-span-2 text-gray-400">{p.asset}</span>
+                    <span className="col-span-2">
+                      <span
+                        className={`inline-block rounded-full px-2 py-0.5 text-xs ${
+                          p.status === "completed"
+                            ? "bg-green-500/20 text-green-400"
+                            : p.status === "pending"
+                            ? "bg-yellow-500/20 text-yellow-400"
+                            : "bg-red-500/20 text-red-400"
+                        }`}
+                      >
+                        {p.status}
+                      </span>
+                    </span>
+                    <span className="col-span-2 text-xs text-gray-500">
+                      {p.createdAt}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
